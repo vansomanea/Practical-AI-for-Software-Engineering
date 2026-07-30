@@ -41,15 +41,52 @@ def ask_once(prompt: str) -> str:
 #   Goal: a loop that keeps the conversation so the bot remembers context.
 # ===========================================================================
 def chat_loop(system_prompt: str, temperature: float):
-    # TODO(2a): start `history` as a list containing ONE system message.
-    # TODO(2b): loop forever:
-    #   - read input from the user with input("you > ")
-    #   - if it's "quit" or "exit", break
-    #   - append the user message to history
-    #   - call the API with the FULL history + temperature
-    #   - print the reply, and append the assistant message to history
-    # TODO(4*): come back in Part 4 to add error handling + a token meter.
-    raise NotImplementedError("Implement chat_loop()")
+    # Start the conversation with one system message
+    history = [
+        {
+            "role": "system",
+            "content": system_prompt,
+        }
+    ]
+
+    while True:
+        user_input = input("you > ").strip()
+
+        # Stop the chatbot
+        if user_input.lower() in {"quit", "exit"}:
+            print("AskBot: Goodbye!")
+            break
+
+        # Ignore empty input
+        if not user_input:
+            continue
+
+        # Add the user's message to the conversation
+        history.append(
+            {
+                "role": "user",
+                "content": user_input,
+            }
+        )
+
+        # Send the entire conversation history to the model
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=history,
+            temperature=temperature,
+        )
+
+        reply = response.choices[0].message.content
+
+        # Display and save the assistant's response
+        print(f"bot > {reply}")
+
+        history.append(
+            {
+                "role": "assistant",
+                "content": reply,
+            }
+        )
 
 
 # ===========================================================================
