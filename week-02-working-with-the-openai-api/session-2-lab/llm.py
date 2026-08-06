@@ -96,25 +96,33 @@ class LLMService:
     total_usage: Usage = field(default_factory=Usage)
     _client: object = field(default=None, repr=False)
 
-    # ---- setup -----------------------------------------------------------
+        # ---- setup -----------------------------------------------------------
+    
+        # ---- setup -----------------------------------------------------------
     def _get_client(self):
-        """Create the OpenAI client lazily so importing this module never
-        requires a key or the network. Raises ConfigurationError if the key
-        is missing (R9 / Step 7 Case A)."""
+        """Create the OpenAI-compatible client for Groq."""
+
         if self._client is not None:
             return self._client
 
-        if not os.environ.get("OPENAI_API_KEY"):
+        api_key = os.environ.get("LLM_API_KEY")
+        base_url = os.environ.get("LLM_BASE_URL")
+
+        if not api_key:
             raise ConfigurationError()
 
         try:
-            from openai import OpenAI  # imported here so tests can run without it
-        except ImportError as exc:  # pragma: no cover
+            from openai import OpenAI
+        except ImportError as exc:
             raise ConfigurationError(
                 "The 'openai' package is not installed. Run: pip install openai"
             ) from exc
 
-        self._client = OpenAI()  # reads OPENAI_API_KEY from the environment
+        self._client = OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+        )
+
         return self._client
 
     # ---- public API ------------------------------------------------------

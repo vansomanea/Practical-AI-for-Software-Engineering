@@ -14,7 +14,8 @@ Type /help inside the session for interactive commands.
 from __future__ import annotations
 
 import argparse
-import sys
+import json
+import sys 
 
 import config
 from llm import LLMService, LLMError, ConfigurationError
@@ -62,6 +63,8 @@ Commands:
   /usage                show total tokens used this session
   /clear                clear the conversation history
   /quit                 exit
+  /save <file>          save the conversation to a JSON file
+  /load <file>          load a conversation from a JSON file
 """
 
 
